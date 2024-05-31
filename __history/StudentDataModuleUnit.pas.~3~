@@ -1,0 +1,28 @@
+unit StudentDataModuleUnit;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, MemDS;
+
+type
+  TDataModule1 = class(TDataModule)
+    UniConnection: TUniConnection;
+    UniQuery: TUniQuery;
+    UniDataSource: TUniDataSource;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DataModule1: TDataModule1;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

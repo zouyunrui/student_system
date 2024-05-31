@@ -1,0 +1,281 @@
+unit StudentDlg;
+
+interface
+
+uses
+  DmStudent, System.RegularExpressions, System.Generics.Collections,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RzRadChk,
+  YcButton, RzPanel, RzRadGrp, YcGroup, Vcl.StdCtrls, Vcl.Mask, DBCtrlsEh,
+  YcEdit, RzLabel, YcLabel, RzButton, Vcl.ExtCtrls, YcPanel, YcDTPicker, YcCombo,
+  StudentUnit, Data.DB, MemDS, DBAccess, Uni;
+
+type
+  // 定义学生信息对话框类
+  TTfrmStudentDlg = class(TForm)
+    YcPanel1: TYcPanel; // 面板
+    YcLabelId: TYcLabel; // 学号标签
+    YcEdtId: TYcEdit; // 学号编辑框
+    YcLabelName: TYcLabel; // 姓名标签
+    YcEdtName: TYcEdit; // 姓名编辑框
+    YcCheckGroupSex: TYcCheckGroup; // 性别多选框组
+    YcRadioButtonM: TYcRadioButton; // 男性单选按钮
+    YcRadioButtonW: TYcRadioButton; // 女性单选按钮
+    YcDateTimePickerBirth: TYcDateTimePicker; // 出生日期选择器
+    YcLabelBirth: TYcLabel; // 出生日期标签
+    YcEdtIdNo: TYcEdit; // 身份证号编辑框
+    YcLabelIdNo: TYcLabel; // 身份证号标签
+    YcComboBoxNPlace: TYcComboBox; // 籍贯选择框
+    YcLabelNPlace: TYcLabel; // 籍贯标签
+    YcEdtTeleNum: TYcEdit; // 联系电话编辑框
+    YcLabelTeleNum: TYcLabel; // 联系电话标签
+    YcComboBoxParentType: TYcComboBox; // 父母类型选择框
+    YcLabelParentType: TYcLabel; // 父母类型标签
+    YcEdtParentName: TYcEdit; // 父母姓名编辑框
+    YcLabelParentName: TYcLabel; // 父母姓名标签
+    YcEdtParentTeleNum: TYcEdit; // 父母电话编辑框
+    YcLabelParentTeleNum: TYcLabel; // 数据查询组件
+    PanelBtn: TPanel; // 按钮面板
+    YcBitBtnCon: TYcBitBtn; // 确认按钮
+    YcBitBtnCan: TYcBitBtn; // 取消按钮
+    procedure FormCreate(Sender: TObject);
+    procedure InitNPlace();
+    procedure InitParentType();
+    procedure UpdateStudentInfor();
+    procedure AddStudentInfor();
+    procedure WriteSQL(Sex: string);
+    procedure YcBitBtnConClick(Sender: TObject);
+    procedure YcBitBtnCanClick(Sender: TObject);
+    procedure SaveStudentInfo(IsNew: Boolean);
+    procedure ValidateInputs;
+    procedure ClearForm;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  TfrmStudentDlg: TTfrmStudentDlg;
+  AddOrUpdate: Boolean; // 标识是否是新增操作
+  IdNoRegex: TRegEx; // 身份证号正则表达式
+  TeleNumRegex: TRegEx; // 电话号码正则表达式
+
+implementation
+
+{$R *.dfm}
+
+var
+  SQLCode: string;
+
+// 初始化籍贯选择框
+procedure TTfrmStudentDlg.InitNPlace();
+begin
+  YcComboBoxNPlace.Items.Add('合肥');
+  YcComboBoxNPlace.Items.Add('芜湖');
+  YcComboBoxNPlace.Items.Add('安庆');
+end;
+
+// 初始化父母类型选择框
+procedure TTfrmStudentDlg.InitParentType;
+begin
+  YcComboBoxParentType.Items.Add('父');
+  YcComboBoxParentType.Items.Add('母');
+end;
+
+// 验证用户输入的信息
+procedure TTfrmStudentDlg.ValidateInputs;
+var
+  IdNoRegex, TeleNumRegex: TRegEx;
+begin
+  // 检查出生日期是否合法
+  if (YcDateTimePickerBirth.Date <= EncodeDate(1980, 1, 1)) or (YcDateTimePickerBirth.Date >= EncodeDate(2010, 1, 1)) then
+  begin
+    raise Exception.Create('出生日期应在 1980.1.1 和 2010.1.1 之间');
+  end;
+
+  // 使用正则表达式验证身份证号格式
+  IdNoRegex := TRegEx.Create('^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$');
+  if not IdNoRegex.IsMatch(Trim(YcEdtIdNo.Text)) then
+  begin
+    raise Exception.Create('身份证号格式不正确');
+  end;
+
+  // 使用正则表达式验证电话号码格式
+  TeleNumRegex := TRegEx.Create('^(1[3-9]\d{9})|((0\d{2,3}-?)?\d{7,8})$');
+  if not TeleNumRegex.IsMatch(Trim(YcEdtTeleNum.Text)) then
+  begin
+    raise Exception.Create('联系电话格式不正确');
+  end;
+  if not TeleNumRegex.IsMatch(Trim(YcEdtParentTeleNum.Text)) then
+  begin
+    raise Exception.Create('父母的电话号码格式不正确');
+  end;
+end;
+
+procedure TTfrmStudentDlg.ClearForm;
+begin
+  //学号
+  YcEdtId.Clear;
+   //姓名
+  YcEdtName.Clear;
+  //性别
+  if YcRadioButtonM.Checked or YcRadioButtonW.Checked then
+  begin
+    YcRadioButtonM.Checked := False;
+    YcRadioButtonW.Checked := False;
+  end;
+  //出生日期
+  YcDateTimePickerBirth.Clear;
+  //身份证号
+  YcEdtIdNo.Clear;
+  //籍贯
+  YcComboBoxNPlace.ItemIndex := -1;
+  //联系电话
+  YcEdtTeleNum.Clear;
+  // 父母类型
+  YcComboBoxParentType.ItemIndex := -1;
+  //父母姓名
+  YcEdtParentName.Clear;
+  //父母电话
+  YcEdtParentTeleNum.Clear;
+end;
+// 保存学生信息
+
+procedure TTfrmStudentDlg.SaveStudentInfo(IsNew: Boolean);
+var
+  Sex: string;
+begin
+  ValidateInputs;
+
+  // 确定性别
+  if YcRadioButtonM.Checked then
+    Sex := '男'
+  else
+    Sex := '女';
+  SQLCode := 'select * from Student where id = :id or id_no = :id_no';
+  DataModule1.UniQuery.SQL.Text := SQLCode;
+  DataModule1.UniQuery.Params.ParamByName('id').AsString := Trim(YcEdtId.Text);
+  DataModule1.UniQuery.Params.ParamByName('id_no').AsString := Trim(YcEdtIdNo.Text);
+
+  DataModule1.UniQuery.Open;
+
+  if IsNew and not DataModule1.UniQuery.Eof then
+    raise Exception.Create('新增学生的学号和身份证号都不能与其他学生的重复!');
+
+  if IsNew then
+    SQLCode := 'INSERT INTO Student (id, name, sex, birthday, id_no, native_place, contact_number, parent_type, parent_name, parent_number, create_time, last_time) ' + 'VALUES (:id, :name, :sex, TO_DATE(:birthday, ''YYYY-MM-DD''), :id_no, :native_place, :contact_number, :parent_type, :parent_name, :parent_number, SYSDATE, SYSDATE)';
+
+  WriteSQL(Sex);
+  ShowMessage(SQLCode);
+  try
+    DataModule1.UniQuery.ExecSQL;
+    if IsNew then
+      ShowMessage('学生信息已成功添加!');
+    ClearForm;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('操作学生信息时出错: ' + E.Message);
+    end;
+  end;
+end;
+
+// 添加学生信息
+procedure TTfrmStudentDlg.AddStudentInfor;
+begin
+  SaveStudentInfo(True);
+end;
+
+// 更新学生信息
+procedure TTfrmStudentDlg.UpdateStudentInfor;
+var
+  Sex: string;
+begin
+//验证信息是否合法
+  ValidateInputs;
+
+  // 确定性别
+  if YcRadioButtonM.Checked then
+    Sex := '男'
+  else
+    Sex := '女';
+      // 提示用户确认删除操作
+  if MessageDlg('修改后数据不能回复，是否继续？', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    try
+        // 构建修改的 SQL 语句
+      SQLCode := 'UPDATE Student SET name = :name, sex = :sex, birthday = TO_DATE(:birthday, ''YYYY-MM-DD''), ' + 'native_place = :native_place, contact_number = :contact_number, parent_type = :parent_type, ' + 'parent_name = :parent_name, parent_number = :parent_number, last_time = SYSDATE ' + 'WHERE id = :id  and id_no =:id_no';
+      WriteSQL(Sex);
+        // 执行修改操作
+      DataModule1.UniQuery.SQL.Text := SQLCode;
+      DataModule1.UniQuery.ExecSQL;
+      ShowMessage(SQLCode);
+      ShowMessage('修改成功');
+    except
+      on E: Exception do
+      begin
+        ShowMessage('修改失败: ' + E.Message);
+      end;
+    end;
+  end
+  else
+  begin
+    ShowMessage('当前数据集为空时不能修改');
+  end;
+end;
+
+
+// 构建 SQL 语句
+procedure TTfrmStudentDlg.WriteSQL(Sex: string);
+begin
+  DataModule1.UniQuery.SQL.Text := SQLCode;
+  DataModule1.UniQuery.Params.ParamByName('id').AsString := Trim(YcEdtId.Text);
+  DataModule1.UniQuery.Params.ParamByName('name').AsString := Trim(YcEdtName.Text);
+  DataModule1.UniQuery.Params.ParamByName('sex').AsString := Sex;
+  DataModule1.UniQuery.Params.ParamByName('birthday').AsString := FormatDateTime('YYYY-MM-DD', YcDateTimePickerBirth.Date);
+  DataModule1.UniQuery.Params.ParamByName('id_no').AsString := Trim(YcEdtIdNo.Text);
+  DataModule1.UniQuery.Params.ParamByName('native_place').AsString := YcComboBoxNPlace.Items[YcComboBoxNPlace.ItemIndex];
+  DataModule1.UniQuery.Params.ParamByName('contact_number').AsString := Trim(YcEdtTeleNum.Text);
+  DataModule1.UniQuery.Params.ParamByName('parent_type').AsInteger := YcComboBoxParentType.ItemIndex + 1;
+  DataModule1.UniQuery.Params.ParamByName('parent_name').AsString := Trim(YcEdtParentName.Text);
+  DataModule1.UniQuery.Params.ParamByName('parent_number').AsString := Trim(YcEdtParentTeleNum.Text);
+end;
+
+// 取消按钮点击事件处理程序
+procedure TTfrmStudentDlg.YcBitBtnCanClick(Sender: TObject);
+begin
+  Close;
+end;
+
+// 确认按钮点击事件处理程序
+procedure TTfrmStudentDlg.YcBitBtnConClick(Sender: TObject);
+begin
+  // 确保所有必填字段都已填写
+  if (YcEdtId.Text <> '') and (YcEdtIdNo.Text <> '') and (Trim(YcEdtName.Text) <> '') and (YcRadioButtonM.Checked or YcRadioButtonW.Checked) and (YcDateTimePickerBirth.Date <> 0) and (YcComboBoxNPlace.ItemIndex >= 0) and (Trim(YcEdtTeleNum.Text) <> '') and (YcComboBoxParentType.ItemIndex >= 0) and (Trim(YcEdtParentName.Text) <> '') and (Trim(YcEdtParentTeleNum.Text) <> '') then
+  begin
+    // 根据新增或修改状态执行相应操作
+    if AddOrUpdate then
+      AddStudentInfor()
+    else
+      UpdateStudentInfor()
+  end
+  else
+  begin
+    ShowMessage('每一条数据都不能为空');
+  end;
+  DataModule1.UniQuery.SQL.Text := 'select * from Student';
+  DataModule1.UniQuery.Open;
+end;
+
+// 窗体创建事件处理程序
+procedure TTfrmStudentDlg.FormCreate(Sender: TObject);
+begin
+  // 初始化籍贯选择框
+  InitNPlace();
+  // 初始化父母类型选择框
+  InitParentType();
+end;
+
+end.
+

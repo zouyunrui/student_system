@@ -1,0 +1,17 @@
+program StudentProject;
+
+uses
+  Vcl.Forms,
+  StudentList in 'StudentList.pas' {TfrmStudentList},
+  StudentUnit in 'StudentUnit.pas',
+  StudentDataModuleUnit in 'StudentDataModuleUnit.pas' {StudentDataModule: TStudentDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TTfrmStudentList, TfrmStudentList);
+  Application.CreateForm(TStudentDataModule, StudentDataModule);
+  Application.Run;
+end.

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B217C095-58C9-4567-9F1A-4ADC4F3E72DA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="StudentProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="StudentDLL.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="StudentProject">
+        <MSBuild Projects="StudentProject.dproj"/>
+    </Target>
+    <Target Name="StudentProject:Clean">
+        <MSBuild Projects="StudentProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="StudentProject:Make">
+        <MSBuild Projects="StudentProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="StudentDLL">
+        <MSBuild Projects="StudentDLL.dproj"/>
+    </Target>
+    <Target Name="StudentDLL:Clean">
+        <MSBuild Projects="StudentDLL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="StudentDLL:Make">
+        <MSBuild Projects="StudentDLL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="StudentProject;StudentDLL"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="StudentProject:Clean;StudentDLL:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="StudentProject:Make;StudentDLL:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

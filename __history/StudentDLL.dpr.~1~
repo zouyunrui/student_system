@@ -1,0 +1,145 @@
+library StudentDLL;
+
+uses
+  System.SysUtils,
+  System.Classes,
+  Data.DB,
+  DBAccess,
+  Uni,
+  UniProvider,
+  OracleUniProvider,
+  MemDS,
+  DmStudent;
+
+{$R *.res}
+
+var
+  UniConnection: TUniConnection;
+procedure InitializeConnection; stdcall;
+begin
+ UniConnection := TUniConnection.Create(nil);
+UniConnection.ProviderName := 'Oracle'; // 你使用的是 Oracle 数据库提供程序
+UniConnection.Server := '192.168.0.91'; // 设置服务器地址
+UniConnection.Port := 1521; // 设置端口号
+UniConnection.Username := 'system';
+UniConnection.Password := '335060';
+UniConnection.Connect;
+
+end;
+
+procedure FinalizeConnection; stdcall;
+begin
+  if Assigned(UniConnection) then
+  begin
+    UniConnection.Disconnect;
+    UniConnection.Free;
+  end;
+end;
+
+procedure AddStudent(Id: Integer; Name: PChar; Sex: PChar; Birthday: TDateTime; IdNo: PChar;
+                     NativePlace: PChar; ContactNumber: PChar; ParentType: Integer;
+                     ParentName: PChar; ParentNumber: PChar); stdcall;
+var
+  UniQuery: TUniQuery;
+begin
+  UniQuery := TUniQuery.Create(nil);
+  try
+    UniQuery.Connection := UniConnection;
+    UniQuery.SQL.Text := 'INSERT INTO Student (id, name, sex, birthday, id_no, native_place, contact_number, parent_type, parent_name, parent_number) VALUES (:id, :name, :sex, :birthday, :id_no, :native_place, :contact_number, :parent_type, :parent_name, :parent_number)';
+    UniQuery.ParamByName('id').AsInteger := Id;
+    UniQuery.ParamByName('name').AsString := String(Name);
+    UniQuery.ParamByName('sex').AsString := String(Sex);
+    UniQuery.ParamByName('birthday').AsDateTime := Birthday;
+    UniQuery.ParamByName('id_no').AsString := String(IdNo);
+    UniQuery.ParamByName('native_place').AsString := String(NativePlace);
+    UniQuery.ParamByName('contact_number').AsString := String(ContactNumber);
+    UniQuery.ParamByName('parent_type').AsInteger := ParentType;
+    UniQuery.ParamByName('parent_name').AsString := String(ParentName);
+    UniQuery.ParamByName('parent_number').AsString := String(ParentNumber);
+    UniQuery.ExecSQL;
+  finally
+    UniQuery.Free;
+  end;
+end;
+
+procedure UpdateStudent(Id: Integer; Name: PChar; Sex: PChar; Birthday: TDateTime; IdNo: PChar;
+                        NativePlace: PChar; ContactNumber: PChar; ParentType: Integer;
+                        ParentName: PChar; ParentNumber: PChar); stdcall;
+var
+  UniQuery: TUniQuery;
+begin
+  UniQuery := TUniQuery.Create(nil);
+  try
+    UniQuery.Connection := UniConnection;
+    UniQuery.SQL.Text := 'UPDATE Student SET name = :name, sex = :sex, birthday = :birthday, id_no = :id_no, native_place = :native_place, contact_number = :contact_number, parent_type = :parent_type, parent_name = :parent_name, parent_number = :parent_number WHERE id = :id';
+    UniQuery.ParamByName('id').AsInteger := Id;
+    UniQuery.ParamByName('name').AsString := String(Name);
+    UniQuery.ParamByName('sex').AsString := String(Sex);
+    UniQuery.ParamByName('birthday').AsDateTime := Birthday;
+    UniQuery.ParamByName('id_no').AsString := String(IdNo);
+    UniQuery.ParamByName('native_place').AsString := String(NativePlace);
+    UniQuery.ParamByName('contact_number').AsString := String(ContactNumber);
+    UniQuery.ParamByName('parent_type').AsInteger := ParentType;
+    UniQuery.ParamByName('parent_name').AsString := String(ParentName);
+    UniQuery.ParamByName('parent_number').AsString := String(ParentNumber);
+    UniQuery.ExecSQL;
+  finally
+    UniQuery.Free;
+  end;
+end;
+
+procedure DeleteStudent(Id: Integer); stdcall;
+var
+  UniQuery: TUniQuery;
+begin
+  UniQuery := TUniQuery.Create(nil);
+  try
+    UniQuery.Connection := UniConnection;
+    UniQuery.SQL.Text := 'DELETE FROM Student WHERE id = :id';
+    UniQuery.ParamByName('id').AsInteger := Id;
+    UniQuery.ExecSQL;
+  finally
+    UniQuery.Free;
+  end;
+end;
+
+procedure QueryStudent(Id: Integer; var Name: PChar; var Sex: PChar; var Birthday: TDateTime;
+                       var IdNo: PChar; var NativePlace: PChar; var ContactNumber: PChar;
+                       var ParentType: Integer; var ParentName: PChar; var ParentNumber: PChar); stdcall;
+var
+  UniQuery: TUniQuery;
+begin
+  UniQuery := TUniQuery.Create(nil);
+  try
+    UniQuery.Connection := UniConnection;
+    UniQuery.SQL.Text := 'SELECT * FROM Student WHERE id = :id';
+    UniQuery.ParamByName('id').AsInteger := Id;
+    UniQuery.Open;
+    if not UniQuery.IsEmpty then
+    begin
+      Name := PChar(UniQuery.FieldByName('name').AsString);
+      Sex := PChar(UniQuery.FieldByName('sex').AsString);
+      Birthday := UniQuery.FieldByName('birthday').AsDateTime;
+      IdNo := PChar(UniQuery.FieldByName('id_no').AsString);
+      NativePlace := PChar(UniQuery.FieldByName('native_place').AsString);
+      ContactNumber := PChar(UniQuery.FieldByName('contact_number').AsString);
+      ParentType := UniQuery.FieldByName('parent_type').AsInteger;
+      ParentName := PChar(UniQuery.FieldByName('parent_name').AsString);
+      ParentNumber := PChar(UniQuery.FieldByName('parent_number').AsString);
+    end;
+  finally
+    UniQuery.Free;
+  end;
+end;
+
+exports
+  InitializeConnection,
+  FinalizeConnection,
+  AddStudent,
+  UpdateStudent,
+  DeleteStudent,
+  QueryStudent;
+
+begin
+end.
+

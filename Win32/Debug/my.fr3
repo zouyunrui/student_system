@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<TfrxReport Version="5.1.11" DotMatrixReport="False" IniFile="\Software\Fast Reports" PreviewOptions.Buttons="3583" PreviewOptions.Zoom="1" PrintOptions.Printer="预设" PrintOptions.PrintOnSheet="0" ReportOptions.CreateDate="45435.7355930208" ReportOptions.Description.Text="" ReportOptions.LastChange="45435.7620994792" ScriptLanguage="PascalScript" ScriptText.Text="&#13;&#10;begin&#13;&#10;&#13;&#10;end.">
+  <Datasets>
+    <item DataSet="frxDBDataset" DataSetName="frxDBDataset"/>
+  </Datasets>
+  <TfrxDataPage Name="Data" Height="1000" Left="0" Top="0" Width="1000"/>
+  <TfrxReportPage Name="Page1" PaperWidth="297" PaperHeight="210" PaperSize="9" Orientation="poLandscape" LeftMargin="10" RightMargin="10" TopMargin="10" BottomMargin="10" ColumnWidth="0" ColumnPositions.Text="" HGuides.Text="" VGuides.Text="">
+    <TfrxReportTitle Name="ReportTitle1" FillType="ftBrush" FillGap.Top="0" FillGap.Left="0" FillGap.Bottom="0" FillGap.Right="0" Height="30" Left="0" Top="0" Width="190">
+      <TfrxMemoView Name="TitleMemo" Left="460" Top="0" Width="190" Height="30" HAlign="haCenter" VAlign="vaCenter" Font.Size="10" Font.Style="1" Text="学生列表报表"/>
+    </TfrxReportTitle>
+    <TfrxPageHeader Name="PageHeader1" Height="20" Top="30">
+      <TfrxMemoView Name="HeaderID" Left="0" Top="10" Width="30" Height="20"  Text="学号"/>
+      <TfrxMemoView Name="HeaderName" Left="50" Top="10" Width="50" Height="20"  Text="姓名"/>
+      <TfrxMemoView Name="HeaderSex" Left="110" Top="10" Width="30" Height="20"  Text="性别"/>
+      <TfrxMemoView Name="HeaderBirthday" Left="150" Top="10" Width="60" Height="20"  Text="出生日期"/>
+      <TfrxMemoView Name="HeaderIDNo" Left="230" Top="10" Width="200" Height="20" Text="身份证号"/>
+      <TfrxMemoView Name="HeaderNativePlace" Left="390" Top="10" Width="60" Height="20" Text="籍贯"/>
+      <TfrxMemoView Name="HeaderContactNumber" Left="440" Top="10" Width="160" Height="20" Text="联系电话"/>
+      <TfrxMemoView Name="HeaderParentType" Left="550" Top="10" Width="60" Height="20" Text="父母类型"/>
+      <TfrxMemoView Name="HeaderParentName" Left="620" Top="10" Width="60" Height="20" Text="父母姓名"/>
+      <TfrxMemoView Name="HeaderParentNumber" Left="700" Top="10" Width="160" Height="20" Text="父母电话"/>
+      <TfrxMemoView Name="HeaderCreateTime" Left="810" Top="10" Width="200" Height="20" Text="创建时间"/>
+      <TfrxMemoView Name="HeaderLastTime" Left="950" Top="10" Width="200" Height="20" Text="最后修改时间"/>
+    </TfrxPageHeader>
+    <TfrxMasterData Name="MasterData1" Height="20" DataSet="frxDBDataset">
+      <TfrxMemoView Name="IDMemo" Left="0" Top="20" Width="30" Height="20" Text="[frxDBDataset.&quot;id&quot;]"/>
+      <TfrxMemoView Name="NameMemo" Left="50" Top="20" Width="50" Height="20" Text="[frxDBDataset.&quot;name&quot;]"/>
+      <TfrxMemoView Name="SexMemo" Left="110" Top="20" Width="30" Height="20" Text="[frxDBDataset.&quot;sex&quot;]"/>
+      <TfrxMemoView Name="BirthdayMemo" Left="150" Top="20" Width="60" Height="20" Text="[frxDBDataset.&quot;birthday&quot;]"/>
+      <TfrxMemoView Name="IDNoMemo" Left="230" Top="20" Width="200" Height="20" Text="[frxDBDataset.&quot;id_no&quot;]"/>
+      <TfrxMemoView Name="NativePlaceMemo" Left="390" Top="20" Width="60" Height="20" Text="[frxDBDataset.&quot;native_place&quot;]"/>
+      <TfrxMemoView Name="ContactNumberMemo" Left="440" Top="20" Width="160" Height="20" Text="[frxDBDataset.&quot;contact_number&quot;]"/>
+      <TfrxMemoView Name="ParentTypeMemo" Left="550" Top="20" Width="60" Height="20" Text="[frxDBDataset.&quot;parent_type&quot;]"/>
+      <TfrxMemoView Name="ParentNameMemo" Left="620" Top="20" Width="60" Height="20" Text="[frxDBDataset.&quot;parent_name&quot;]"/>
+      <TfrxMemoView Name="ParentNumberMemo" Left="700" Top="20" Width="160" Height="20" Text="[frxDBDataset.&quot;parent_number&quot;]"/>
+      <TfrxMemoView Name="CreateTimeMemo" Left="810" Top="20" Width="200" Height="20" Text="[frxDBDataset.&quot;create_time&quot;]"/>
+      <TfrxMemoView Name="LastTimeMemo" Left="950" Top="20" Width="200" Height="20" Text="[frxDBDataset.&quot;last_time&quot;]"/>
+    </TfrxMasterData>
+    <TfrxPageFooter Name="PageFooter1" Height="20">
+      <TfrxMemoView Name="PageNumberMemo" Left="0" Top="0" Width="100" Height="20" HAlign="haRight" Text="[Page#]"/>
+    </TfrxPageFooter>
+  </TfrxReportPage>
+</TfrxReport>
